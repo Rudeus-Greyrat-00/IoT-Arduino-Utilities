@@ -1,0 +1,14 @@
+#include "LiquidCrystal_PCF8574.h"
+
+//check pin configurator online to see how to connect SCL and SDA pins
+LiquidCrystal_PCF8574 display(0x27);
+
+void setup() {
+  // other stuff...
+  display.begin(16,2);
+  display.setBacklight(255);
+  display.setCursor(0, 1);
+  display.print("Hello ^^");
+  // other stuff...
+}
+
