@@ -1,0 +1,65 @@
+//REQUIRE WiFi Connection - Management
+
+#include <PubSubClient.h>
+
+const char* mqtt_server = "broker.mqttdashboard.com";
+const char* topic_sometopic = "IoT_measures/sometopic";
+const char* topic_someothertopic = "IoT_measures/someothertopic";
+
+int verbose = 10;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void handleMQTT() {
+  if (!client.connected()) {
+    if (verbose > 0) Serial.println("Attempting MQTT connection");
+    String clientID = "ESP2866-";
+    clientID += "395102"; //an innocent absolutely random number
+
+    if (client.connect(clientID.c_str())) {
+      if (verbose > 0) Serial.println("Connected to MQTT");
+    } else {
+      if (verbose > 0) {
+        Serial.println("Failed MQTT, rc = ");
+        Serial.print(client.state());
+      }
+      delay(5000);
+    }
+    //SUBSCRIBE TO MQTT TOPICS
+    client.subscribe(topic_sometopic);
+  }
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  // Convert the payload to a string
+  String message;
+  for (int i = 0; i < length; i++) {
+    message += (char)payload[i];
+  }
+  if (verbose > 1) {
+    Serial.print("Message arrived [");
+    Serial.print(topic);
+    Serial.println("]");
+    Serial.println(message);
+  }
+  // CODE TO DO WHEN AN MQTT MESSAGE ARRIVE HERE
+}
+
+void setup() {
+  //other stuff... wifi initialization...
+  handleMQTT();
+  client.setCallback(callback); //DON'T FORGET THIS ONE
+  client.setServer(mqtt_server, 1883);
+  //other initialization stuff...
+}
+
+void loop(){
+  //other stuff... wifi managament for instance, and so on
+  handleMQTT();
+  client.loop();
+  //other stuff...
+  if (something_very_interesting_happened) {
+    client.publish(topic_someothertopic, "Resistance is futile");
+  }
+}
