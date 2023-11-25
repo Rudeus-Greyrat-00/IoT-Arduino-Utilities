@@ -18,3 +18,11 @@ void handleConnection() {
     if (verbose > 2) Serial.println("Connection ok");
   }
 }
+
+void printConnectionInfo() {
+  Serial.println("");
+  Serial.print("Connected to ");
+  Serial.println(SSID);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}
