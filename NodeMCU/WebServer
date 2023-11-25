@@ -1,0 +1,40 @@
+//REQUIRE WiFi Connection - Management
+
+#include <ESP8266WebServer.h>
+
+ESP8266WebServer server(80); // or any other port different from 80
+
+void handleSomething1() {
+  server.send(200, "text/plain", "HelloWorld!");
+}
+
+void handleSomething2() {
+  t = doSomething();
+  server.send(200, "text/plain", String(t));
+}
+
+void handleNotFound() {
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  //Prints GET or POST according to server.method()
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+  //We want to return the arguments (Name and Value) the user was asking for
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+  server.send(404, "text/plain", message);
+}
+
+void setup(){
+  // other setup things... wifi initialization... and so on
+  server.on("/", handleSomething1);
+  server.on("/path/you/want", handleSomething2);
+  server.onNotFound(handleNotFound);
+  server.begin();
+  // other things...
+}
